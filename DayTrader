@@ -1,0 +1,73 @@
+import java.util.*;
+
+public class DayTrader {
+	
+	public static void main(String[] args) {
+		long seed = System.currentTimeMillis();
+		java.util.Random rand = new java.util.Random(seed);
+//		int[] profit = {-5, 10};	//a test we can do by hand to check for correctness
+		int n = 800;	//choosing the amount of elements in our array
+		int[] profit = new int[n];
+//		int[] profit = {-15,-20,-30,-50,-3,-6}; 	//test for all negative numbers
+		for(int i = 0; i < n; i++){
+			profit[i] = rand.nextInt(100) - 50;
+		}
+		System.out.println("array generation complete \n");
+		//runs our O(n^3) algorithm A
+		long time1 = System.currentTimeMillis();
+		int s1 = algorithmAforStrength(profit);
+		time1 = (System.currentTimeMillis() - time1) / 1000;
+		//runs our O(n) algorithm B
+		long time2 = System.currentTimeMillis();
+		int s2 = algorithmBforStrength(profit);
+		time2 = (System.currentTimeMillis() - time2) / 1000;
+		
+		System.out.println(s1);
+		System.out.println("Algorithm A time: " + time1 + " seconds \n");
+		System.out.println(s2);
+		System.out.println("Algorithm B time: " + time2 + " seconds \n");
+
+		
+	}
+	
+	public static int algorithmAforStrength(int[] profit){
+		int max = profit[0];
+		int localSum = 0;
+		int n = profit.length;
+		
+		//i = size of interval
+		//j = starting index in interval
+		//k = current position in current interval
+		
+		for(int i = 1; i <= n; i++){
+			for(int j = 0; j <= (n-i); j++){
+				for(int k = j; k < (i+j); k++){
+					localSum += profit[k];
+				}
+			if(localSum > max){
+				max = localSum;
+			}
+			localSum = 0;
+			}
+		}
+		return max;
+	}
+
+	
+	public static int algorithmBforStrength (int[]p){
+		int n = p.length;
+		int [] x = new int[n];			//x[] is my graph of values
+		x[0] = p[0];
+		int max = 0;
+		for (int i = 1; i < n; i++){
+			if(x[i-1] < 0)					//if at any point it goes below 0 just set it to 0
+				x[i-1] = 0;					//and continue to add on from there//this builds our graph, just add the currents days profit to
+			x[i] = p[i] + x[i-1];			//the last day's total profit
+
+			if(x[i] > max)				//creates a new max value if there is one
+				max = x[i];
+		}
+
+		return max;
+	}	
+}
